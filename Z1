@@ -1,0 +1,7 @@
+import numpy as np
+
+data = np.genfromtxt(r"C:/temp/ABBREV.csv", delimiter=';', dtype=None, names=True, encoding="utf8")
+print(np.sort(data[(np.where(data['Energ_Kcal'] == np.amax(data['Energ_Kcal'])))]['Shrt_Desc'])[-1])
+print(np.sort(data[(np.where(data['Sugar_Tot_g'] == np.amin(data['Sugar_Tot_g'])))]['Shrt_Desc'])[0])
+print(np.sort(data[(np.where(data['Protein_g'] == np.amax(data['Protein_g'])))]['Shrt_Desc'])[-1])
+print(np.sort(data[(np.where(data['Vit_C_mg'] == np.amax(data['Vit_C_mg'])))]['Shrt_Desc'])[-1])
