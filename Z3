@@ -1,0 +1,64 @@
+import json
+import os
+import numpy as np
+import glob
+
+
+def get_files_sizes(dirpath):
+    countfile = 1
+    files = []
+    for filename in glob.glob(dirpath):
+        files.append(filename)
+        print(str(countfile) + ') ' + filename.split('\\')[-1], os.stat(filename).st_size // 8, "Байт")
+        countfile += 1
+    return files
+
+
+files = get_files_sizes(r'C:\temp\*.*')
+data = []
+flag = False
+for i in files:
+    if i.split('\\')[-1] == 'Z3.csv':
+        json_path = '\\'.join(i.split('\\')[:-1])
+        print(json_path)
+        data = np.genfromtxt(i, delimiter=';', dtype=None, names=True, encoding="utf8")
+        flag = True
+        break
+if flag:
+    print("Файл успешно прочитан.")
+else:
+    print('Такого файла не существует.')
+    exit(0)
+try:
+    print("Объект отсортированный по строковому полю.\n", data[np.argsort(data['FIO_doc'].astype("str_"))])
+except:
+    print("Ошибка данных")
+try:
+    print("Объект отсортированный по числовому полю.\n", data[np.argsort(data['time'].astype("int64"))])
+except:
+    print("Ошибка данных")
+try:
+    res_where = data[np.where(data['time'] > 20)]
+    print("Пациенты, у которых время приёма больше 20 минут.\n", res_where)
+    res_where = res_where.tolist()
+    json_str = json.dumps(res_where)
+except:
+    print("Ошибка данных")
+
+print(json_path + '\Z3.json')
+new_file_json = open(json_path + '\Z3.json', 'w')
+new_file_json.write(json_path)
+new_file_json.close()
+print("Запись в json файл произошла успешно")
+for i in files:
+    if i.split('\\')[-1] == 'Z3.csv':
+        os.remove(i)
+        print("csv файл успешно удалён")
+        break
+
+os.replace(json_path + '\Z3.json', '\\'.join(json_path.split('\\')[:-1]) + '\Z3.json')
+print('json файл успешно перемещён из', json_path + '\Z3.json', 'в', '\\'.join(json_path.split('\\')[:-1]) + '\Z3.json')
+
+
+
+
