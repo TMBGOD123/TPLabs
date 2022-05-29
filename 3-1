@@ -1,0 +1,37 @@
+import requests, io
+
+apikey = "3de206c0-df87-41f6-b603-fe0b2724aa6f"
+
+def fetch_coordinates(apikey, address):
+    base_url = "https://geocode-maps.yandex.ru/1.x"
+    response = requests.get(base_url, params={
+        "geocode": address,
+        "apikey": apikey,
+        "format": "json",
+    })
+    found_places = response.json()['response']['GeoObjectCollection']['featureMember']
+
+    if not found_places:
+        print("Место не найдено")
+        exit(0)
+
+    most_relevant = found_places[0]
+    lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
+    map_request = "http://static-maps.yandex.ru/1.x/?ll={ll}&z={z}&l={type}".format(ll=str(lon)+","+str(lat), z="15", type="map")
+    try:
+        response = requests.get(map_request)
+    except:
+        print("Ошибка получения карты")
+    map_file = r"C:\temp\map.png"
+    try:
+        with open(map_file, "wb") as file:
+            file.write(response.content)
+    except IOError as ex:
+        print("Ошибка")
+        exit(0)
+    return lon, lat
+
+
+adr = input('Введите адрес места: ')
+print(fetch_coordinates(apikey, adr))
+
